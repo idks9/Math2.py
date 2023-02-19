@@ -105,11 +105,11 @@ def shorthen_decimal(dm):
             l = len(n_str_split[0])+5;
             # This string is the sum of the integers, the dot and the decimals,
             # but only the indexes from 0 to l, then i transform it in float
-            dm[i][e] = float((n_str_split[0]+"."+n_str_split[1])[:l]);
+            dm[i][e] = float((n_str_split[0]+"."+n_str_split[1])[:l]+"2");
     return dm
 # Escalonates a matrix, in certain cases it may bug, but almost all times it will be fine
 def escalonate(data:list):
-    # Go to https://pt.planetcalc.com/8328/ and put some random matrix there to see the step by step
+     # Go to https://pt.planetcalc.com/8328/ and put some random matrix there to see the step by step
     # "md" stands for "main diagonal"
     md = main_diagonal(data);
     # "nnmd" stands for "number of number in main diagonal"
@@ -216,53 +216,54 @@ def somatory(dataX):
     for x in dataX:
         r += x;
     return r;
-
-def return_stuff(a):
-    return a;
+#finds the diagonal of some position
+def diagonal(pos, axis, data):
+    d = [];
+    i = 0;
+    while True:
+        try:
+            d.append(data[i][pos]);
+            i += 1;
+            pos += axis;
+        except IndexError: 
+            return d;
 # Concatenates two bi-dimensional arrays
 def concatenate(a:list,b:list):
     for i in range(len(a)):
         for e in range(len(b[0])):
             a[i].append(b[i][e])
     return a;
-# Finds the determinant of a matrix(only 2x2, 3x3 or 4x4)
+# returns cofactor of a number in a matrix
+# "l" = "line", "c" = "column"
+def cofactor(data, l, c):
+    matrix = np.array(data).tolist();
+    for i in range(len(matrix)):
+        matrix[i].pop(c);
+    matrix.pop(l);
+    D_ie = determinant(matrix, len(matrix));
+    return ((-1)**(l+c)) * D_ie;
+# Finds the determinant of a matrix(only NxN type)
 def determinant(data, size):
-    # I'm using the leibnz(sry i don't how to write lol) method for determinants, since the matrix has the form of a square
     # "v" is the value i want to return
-    v = 0;
-    # "l" is the current line
-    l = 0;
-    # "tl" stands for "times line", it means how many times i executed the for loop
-    tl = 0;
-    delta = np.array(data).tolist();
-    for i in range(len(delta)):
-        delta[i].pop();
-    data = concatenate(data, delta);
-    for t in range(size):
-        # "vt" stands for "temporary value", i'll use this to multiply the diagonal and then sum it with "v"
-        vt = 1;
-        for i in range(len(data)):
-            # "vt" stands for "temporary value", i'll use this to sum the diagonal and then multiplicate it with "v"
-            vt *= data[i][l+t];
-            l += 1;
-        v += vt;
-        vt = 0;
-        l = 0;
-        # First part done, now to the second one
-    for t in range(size):
-        # "vt" stands for "temporary value", i'll use this to multiply the diagonal and then sum it with "v"
-        vt = 1;
-        l = 1;
-        for i in range(len(data)):
-            # "vt" stands for "temporary value", i'll use this to sum the diagonal and then multiplicate it with "v"
-            vt *= data[i][-(l+t)];
-            l += 1;
-        v -= vt;
-        vt = 0;
-        l = 0;
+    if size == 2:
+        return data[0][0]*data[1][1] - data[0][1]*data[1][0];
+    # I'm using sarrus for matrixes with N = 3
+    elif size == 3:
+        v  = data[0][0]*data[1][1]*data[2][2];
+        v -= data[0][0]*data[1][2]*data[2][1];
+        v += data[0][1]*data[1][2]*data[2][0];
+        v -= data[0][1]*data[1][0]*data[2][2];
+        v += data[0][2]*data[1][0]*data[2][1];
+        v -= data[0][2]*data[1][1]*data[2][0];
+    # I'm using the laplace for matrix with N > 3
+    else:
+        v = 0;
+        for e in range(len(data)):
+            v += data[0][e]*cofactor(data, 0, e);
     return v;
 # Finds the equation that forms a graphic
 # Returning a,b,c and so on
+# Sometimes it'll point a "ZeroDivisionError" but i dont think it is be that bad
 def find_graphic_equation(data, exponential):
     #                      ^- a array with the x points in the 0 index and the y points on the 1
     parameters = [];
@@ -272,7 +273,7 @@ def find_graphic_equation(data, exponential):
     for i in range(exponential+1):
         # Doesn't matter what the index is, if it fits on the "data[0]" and "data[1]" array i'll be able to use
         indexes.append(random.randint(0, len(data[0])-1))
-        # It doesn't work with only one loop, because i need to check the entire array every time "cycle" of this first loop
+        # It doesn't work with only one loop, because i need to check the entire array every "cycle" of this first loop
         for e in range(len(indexes)-1):
             for t in range(len(indexes)):
                 if indexes[t] == indexes[-1]:
@@ -303,12 +304,36 @@ def find_graphic_equation(data, exponential):
     # Just feeding delta_xyz with enough delta copies
     for c in range(exponential+1):
         delta_xyz.append(np.array(delta).tolist());
-    # Now that'll be a pretty meme
-    # Exquisite!
     for c in range(len(delta_xyz)):
         for i in range(len(delta_xyz[0])):
             for e in range(len(delta_xyz[0][0])):
                 # i use "e == c" here because the column that will recieve the "y" value needs to be according to the "variables"
                 # on a equation system, to substitute just the right ones 
                 if e == c: delta_xyz[c][i][e] = data[1][indexes[i]];
+    delta_determinant = determinant(delta,exponential+1);
+    for c in range(len(delta_xyz)):
+        parameters.append(determinant(delta_xyz[c],exponential+1)/delta_determinant);
     return parameters;
+#finds the r2 score of a regression
+def r2(data, parameters):
+    mean_y = mean(data[1]);
+    squares1 = 0;
+    squares2 = 0;
+    e = 0;
+    c = 0;
+    while True:
+        try:
+            squares1 += (mean_y)**2;
+            ex = len(parameters)-1;
+            for i in range(len(parameters)):
+                if ex != 0:
+                    e += parameters[i]*((data[0][c])**ex);
+                    ex -= 1;
+                else: squares2 += parameters[i];
+            squares2 = (e)**2;
+            c += 1;
+        except IndexError: break
+    a = (squares1-squares2)/squares2;
+    if a < 0:
+        a *= -1;
+    return a;
