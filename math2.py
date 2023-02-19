@@ -323,8 +323,10 @@ def r2(data, parameters):
     c = 0;
     while True:
         try:
+            # builds the squares of the thing with and without regression
             squares1 += (mean_y)**2;
             ex = len(parameters)-1;
+            # This is because i need to execute the equation that i dont know the size, so i'll just loop
             for i in range(len(parameters)):
                 if ex != 0:
                     e += parameters[i]*((data[0][c])**ex);
