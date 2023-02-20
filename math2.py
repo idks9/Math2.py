@@ -263,7 +263,6 @@ def determinant(data, size):
     return v;
 # Finds the equation that forms a graphic
 # Returning a,b,c and so on
-# Sometimes it'll point a "ZeroDivisionError" but i dont think it is be that bad
 def find_graphic_equation(data, exponential):
     #                      ^- a array with the x points in the 0 index and the y points on the 1
     parameters = [];
@@ -272,12 +271,8 @@ def find_graphic_equation(data, exponential):
     # square
     for i in range(exponential+1):
         # Doesn't matter what the index is, if it fits on the "data[0]" and "data[1]" array i'll be able to use
-        indexes.append(random.randint(0, len(data[0])-1))
-        # It doesn't work with only one loop, because i need to check the entire array every "cycle" of this first loop
-        for e in range(len(indexes)-1):
-            for t in range(len(indexes)):
-                if indexes[t] == indexes[-1]:
-                    indexes[-1] = random.randint(0, len(data[0])-1);
+        indexes.append(i);
+    print(indexes)
     delta = [];
     # "ex" means "exponential", i need it that way because i'll decrease it's value later
     ex = exponential
