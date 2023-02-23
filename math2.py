@@ -272,7 +272,6 @@ def find_graphic_equation(data, exponential):
     for i in range(exponential+1):
         # Doesn't matter what the index is, if it fits on the "data[0]" and "data[1]" array i'll be able to use
         indexes.append(i);
-    print(indexes)
     delta = [];
     # "ex" means "exponential", i need it that way because i'll decrease it's value later
     ex = exponential
@@ -319,15 +318,15 @@ def r2(data, parameters):
     while True:
         try:
             # builds the squares of the thing with and without regression
-            squares1 += (mean_y)**2;
             ex = len(parameters)-1;
             # This is because i need to execute the equation that i dont know the size, so i'll just loop
             for i in range(len(parameters)):
                 if ex != 0:
                     e += parameters[i]*((data[0][c])**ex);
                     ex -= 1;
-                else: squares2 += parameters[i];
-            squares2 = (e)**2;
+                else: e += parameters[i];
+            squares2 += (e-data[1][c])**2;
+            squares1 += (mean_y-data[1][c])**2;
             c += 1;
         except IndexError: break
     a = (squares1-squares2)/squares2;

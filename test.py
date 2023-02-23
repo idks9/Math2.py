@@ -7,5 +7,4 @@ x = data[0][:6];
 y = data[1][:6]
 p = math2.find_graphic_equation([x, y], 3);
 
-print(x)
-print(p[0]*(data[0][-1]**3)+p[1]*(data[0][-1]**2)+p[2]*(data[0][-1])+p[3])
+print(math2.r2(data, p))
