@@ -107,37 +107,6 @@ def shorthen_decimal(dm):
             # but only the indexes from 0 to l, then i transform it in float
             dm[i][e] = float((n_str_split[0]+"."+n_str_split[1])[:l]+"2");
     return dm
-# Escalonates a matrix, in certain cases it may bug, but almost all times it will be fine
-def escalonate(data:list):
-     # Go to https://pt.planetcalc.com/8328/ and put some random matrix there to see the step by step
-    # "md" stands for "main diagonal"
-    md = main_diagonal(data);
-    # "nnmd" stands for "number of number in main diagonal"
-    nnmd = len(md);
-    # "dm" stands for "data multiplied"
-    dm = [];
-    for x in data:
-        dm.append(do_stuff_to_line(x, 1/x[0], "*"));
-    if len(data) != 2:
-        for i in range(len(dm)):
-            if i != 0:
-                dm[i] = do_stuff_to_line(dm[i], dm[0], "-");
-                dm[i] = do_stuff_to_line(dm[i], to_fraction(dm[i][1])[1]/to_fraction(dm[i][1])[0], "*");
-        dm = shorthen_decimal(dm);
-        for i in range(len(dm)):
-            if not i in [0,1]:
-                dm[i] = do_stuff_to_line(dm[i], dm[1], "-")
-        # "slmsef" may seen like i punched my keyboard, but it stands for 
-        # "second line multiplicated by second element of first"
-        slmsef = do_stuff_to_line(dm[1], dm[0][1], "*");
-        dm[0] = do_stuff_to_line(dm[0], slmsef, "-");
-        # Doing this because 4 decimals are enough, and more than that is dangerous
-        dm = shorthen_decimal(dm);
-    else:
-        for i in range(len(dm)):
-            if i != 0:
-                dm[i] = do_stuff_to_line(dm[i], dm[0], "-");
-    return dm;
 # "Transposes" a matrix
 def transpose(matrix:list):
     """ Our normal matrix
